@@ -24,15 +24,7 @@ export default function RootLayout({ children }) {
       >
         <header className="flex justify-end items-center p-4 gap-4 h-16"></header>
 
-        <main>
-          {children}
-
-          <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
-            <h1 className="text-2xl font-semibold mb-4">
-              Please sign in to access the app
-            </h1>
-          </div>
-        </main>
+        <main>{children}</main>
       </body>
     </html>
   );
