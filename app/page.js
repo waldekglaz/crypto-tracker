@@ -8,7 +8,6 @@ export default function Home() {
   const [selected, setSelected] = useState([]);
   const [prices, setPrices] = useState({});
 
-  // Load from localStorage on first render
   useEffect(() => {
     const fetchSelectedCryptos = async () => {
       try {
@@ -42,8 +41,23 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [selected]);
 
-  const handleDelete = (index) => {
-    setSelected((prev) => prev.filter((_, i) => i !== index));
+  const handleDelete = async (cryptoId) => {
+    try {
+      const res = await fetch("/api/cryptos", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cryptoId }),
+      });
+
+      if (!res.ok) throw new Error("Failed to delete crypto");
+
+      // Re-fetch updated list from DB
+      const updated = await fetch("/api/cryptos");
+      const updatedData = await updated.json();
+      setSelected(updatedData);
+    } catch (err) {
+      console.error("Error deleting crypto:", err);
+    }
   };
 
   return (
@@ -123,7 +137,7 @@ export default function Home() {
                     <td className="p-3">
                       <button
                         className="text-red-600 hover:underline"
-                        onClick={() => handleDelete(index)}
+                        onClick={() => handleDelete(crypto.id)}
                       >
                         🗑️
                       </button>

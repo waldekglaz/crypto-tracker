@@ -33,3 +33,22 @@ export async function POST(req) {
 
   return new Response("OK");
 }
+
+export async function DELETE(req) {
+  const body = await req.json();
+  const { cryptoId } = body;
+
+  if (!cryptoId) {
+    return new Response("Missing cryptoId", { status: 400 });
+  }
+
+  const { db } = await connectToDatabase();
+
+  const result = await db.collection("cryptos").deleteOne({ cryptoId });
+
+  if (result.deletedCount === 0) {
+    return new Response("Crypto not found", { status: 404 });
+  }
+
+  return new Response("Deleted", { status: 200 });
+}
