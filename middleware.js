@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export function middleware(req) {
   const auth = req.headers.get("authorization");
 
-  const validUser = "me";
+  const validUser = process.env.USER;
   const validPass = process.env.WEBPAGE_PASS;
 
   console.log(validPass, "valid pass");
