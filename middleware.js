@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 export function middleware(req) {
   const auth = req.headers.get("authorization");
 
-  const validUser = process.env.NEXT_PUBLIC_USER;
-  const validPass = process.env.NEXT_PUBLIC_WEBPAGE_PASS;
+  const validUser = "master";
+  const validPass = "secret";
 
   console.log(validPass, "valid pass");
 
