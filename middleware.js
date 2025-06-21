@@ -1,12 +1,28 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-export default clerkMiddleware();
+export function middleware(req) {
+  const auth = req.headers.get("authorization");
+
+  const validUser = "me";
+  const validPass = process.env.WEBPAGE_PASS;
+
+  console.log(validPass, "valid pass");
+
+  if (auth) {
+    const base64 = auth.split(" ")[1];
+    const [user, pass] = atob(base64).split(":");
+
+    if (user === validUser && pass === validPass) {
+      return NextResponse.next();
+    }
+  }
+
+  return new Response("Auth required", {
+    status: 401,
+    headers: { "WWW-Authenticate": 'Basic realm="Secure Area"' },
+  });
+}
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!api|_next|favicon.ico).*)"], // protect all pages
 };

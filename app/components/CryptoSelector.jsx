@@ -15,7 +15,7 @@ export default function CryptoSelector({ onAdd }) {
 
     onAdd({ id: selectedId, price: buyPrice, quantity });
 
-    // 🔁 Clear the input after adding
+    // Clear the input after adding
     priceRef.current.value = "";
     quantityRef.current.value = "";
   };
