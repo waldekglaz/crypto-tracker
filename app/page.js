@@ -10,16 +10,18 @@ export default function Home() {
 
   // Load from localStorage on first render
   useEffect(() => {
-    const stored = localStorage.getItem("crypto-tracker");
-    if (stored) {
-      setSelected(JSON.parse(stored));
-    }
-  }, []);
+    const fetchSelectedCryptos = async () => {
+      try {
+        const res = await fetch("/api/cryptos");
+        const data = await res.json();
+        setSelected(data); // expects an array like [{ id, price, quantity }]
+      } catch (err) {
+        console.error("Error loading cryptos:", err);
+      }
+    };
 
-  // Save to localStorage whenever selected changes
-  useEffect(() => {
-    localStorage.setItem("crypto-tracker", JSON.stringify(selected));
-  }, [selected]);
+    fetchSelectedCryptos();
+  }, []);
 
   // Fetch current prices
   useEffect(() => {
@@ -49,7 +51,29 @@ export default function Home() {
       <h1 className="text-3xl font-bold">Crypto Tracker</h1>
 
       <CryptoSelector
-        onAdd={(crypto) => setSelected((prev) => [...prev, crypto])}
+        onAdd={async (crypto) => {
+          setSelected((prev) => [...prev, crypto]);
+          try {
+            const res = await fetch("/api/cryptos", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                cryptoId: crypto.id,
+                buyPrice: crypto.price,
+                quantity: crypto.quantity,
+              }),
+            });
+
+            if (!res.ok) throw new Error("Failed to save crypto");
+
+            // ⏬ Re-fetch full list from DB
+            const updated = await fetch("/api/cryptos");
+            const updatedData = await updated.json();
+            setSelected(updatedData);
+          } catch (error) {
+            console.error("Failed to save crypto:", error);
+          }
+        }}
       />
 
       {selected.length > 0 && (
