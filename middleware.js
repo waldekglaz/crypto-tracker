@@ -1,28 +1,15 @@
 import { NextResponse } from "next/server";
 
-export function middleware(req) {
-  const auth = req.headers.get("authorization");
+export function middleware(request) {
+  const isLoggedIn = request.cookies.get("session")?.value === "active";
 
-  const validUser = "master";
-  const validPass = "secret";
-
-  console.log(validPass, "valid pass");
-
-  if (auth) {
-    const base64 = auth.split(" ")[1];
-    const [user, pass] = atob(base64).split(":");
-
-    if (user === validUser && pass === validPass) {
-      return NextResponse.next();
-    }
+  if (!isLoggedIn && !request.nextUrl.pathname.startsWith("/login")) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return new Response("Auth required", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Secure Area"' },
-  });
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|favicon.ico).*)"], // protect all pages
+  matcher: ["/((?!api|_next|favicon.ico|public).*)"],
 };

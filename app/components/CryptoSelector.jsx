@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { availableCryptos } from "./const/consts";
+import { availableCryptos } from "../const/consts";
 
 export default function CryptoSelector({ onAdd }) {
   const [selectedId, setSelectedId] = useState(availableCryptos[0].id);
